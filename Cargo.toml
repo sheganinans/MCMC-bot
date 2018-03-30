@@ -1,0 +1,10 @@
+[package]
+name = "disbot"
+version = "0.1.0"
+authors = ["ace"]
+
+[dependencies]
+serenity = { version = "0.5.1", default-features = true }
+markov = "1.0.1"
+itertools = "0.7.8"
+quickersort = "3.0.1"

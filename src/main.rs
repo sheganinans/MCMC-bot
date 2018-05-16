@@ -20,6 +20,9 @@ use std::io::prelude::*;
 use std::fs::{File, OpenOptions};
 use std::path::Path;
 
+struct Handler;
+impl EventHandler for Handler {}
+
 fn main() {
     let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("Missing DISCORD_TOKEN"), Handler)
         .expect("client err");
@@ -101,42 +104,36 @@ command!(mimic(_ctx, msg) {
                     let _ = msg.reply(&format!("Mimic {} ready! Let's see what it's like!", chain_id));
                 } else {()}
 
-		let _ = msg.reply(&format!("Loading mimic: {}", chain_id));
+                let _ = msg.reply(&format!("Loading mimic: {}", chain_id));
                 let mut chain = Chain::<String>::load(&Path::new(&format!("./data/chain/{}", chain_id)));
 
-		match chain {
-		Err(err) => { let _ = msg.reply(&format!("ERR! {:?}", err)); },
-		Ok(chain) => {
-//		let _ = msg.reply("Chain loaded.");
-                let mimic_str = ms.iter().fold("".to_string(),
-                                               |mut acc, val| { acc.push_str(" ");
-                                                                acc.push_str(&val.name);
-                                                                acc });
-//		let _ = msg.reply("Mimicing");
-		let mut rep = "".to_string();
-		let mut ch = chain.iter();
-		let mut num_resp = 0;
-		while num_resp < 10 {
-			let line = ch.next();
-			match line {
-				None => {},
-				Some(line) => {
-					if line[0].starts_with(";;") ||
-						 line[0].starts_with(".") ||
-						 line[0].starts_with("!") ||
-						 line.len() < 7 {}
-					else {
-	                        		for word in line {
-							if word.starts_with("<") {}
-							else {
-								rep.push_str(&word);
-								rep.push_str(" ")
-							}
-                        			}
-                        			rep.push_str("\n\n");
-						num_resp += 1
-					}
-				}
-			}
-		}
-                let _ = msg.reply(&format!("Mimicking{}:\n\n{}", mimic_str, rep)); }}}}}});
+                match chain {
+                    Err(err) => { let _ = msg.reply(&format!("ERR! {:?}", err)); },
+                    Ok(chain) => {
+                        let mimic_str = ms.iter().fold("".to_string(),
+                                                       |mut acc, val| { acc.push_str(" ");
+                                                                        acc.push_str(&val.name);
+                                                                        acc });
+                        let mut rep = "".to_string();
+                        let mut chn = chain.iter();
+                        let mut num_resp = 0;
+                        while num_resp < 10 {
+                            let line = chn.next();
+                            match line {
+                                None => {},
+                                Some(line) => {
+                                    let first_word = &line[0];
+                                    if first_word.starts_with(";;") ||
+                                       first_word.starts_with(".") ||
+                                       first_word.starts_with("!") ||
+                                       line.len() < 7
+                                        {}
+                                    else {
+                                        for word in &line {
+                                            if word.starts_with("<@") {}
+                                            else {
+                                                rep.push_str(&word);
+                                                rep.push_str(" ") }}
+                                        rep.push_str("\n\n");
+                                        num_resp += 1 }}}}
+                        let _ = msg.reply(&format!("Mimicking{}:\n\n{}", mimic_str, rep)); }}}}}});

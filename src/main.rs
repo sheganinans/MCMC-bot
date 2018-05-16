@@ -83,7 +83,6 @@ command!(mimic(_ctx, msg) {
         match &msg.mentions.clone().into_iter().filter(|x| !x.bot).collect::<Vec<_>>()[..] {
             &[] => { let _ = msg.reply("Requires non-bot @mention."); },
             ms  => {
-                let _ = msg.reply("Beep Boop! This mimic doesn't exist yet! Generating..");
                 let mut chain = Chain::of_order(2);
                 for m in ms { chain.feed_file(&Path::new(&format!("./data/raw/{}", m.id.0)))?; }
 
@@ -113,4 +112,5 @@ command!(mimic(_ctx, msg) {
                                         rep.push_str(" ") }}
                                 rep.push_str("\n\n");
                                 num_resp += 1 }}}}
+                
                 let _ = msg.reply(&format!("Mimicking{}:\n\n{}", mimic_str, rep)); }}}});

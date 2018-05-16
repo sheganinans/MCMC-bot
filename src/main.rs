@@ -90,11 +90,11 @@ command!(mimic(_ctx, msg) {
                                                |mut acc, val| { acc.push_str(" ");
                                                                 acc.push_str(&val.name);
                                                                 acc });
-                let mut rep = "".to_string();
-                let mut chn = chain.iter();
+                let mut reply = "".to_string();
+                let mut chain_iter = chain.iter();
                 let mut num_resp = 0;
                 while num_resp < 10 {
-                    let line = chn.next();
+                    let line = chain_iter.next();
                     match line {
                         None => {},
                         Some(line) => {
@@ -108,9 +108,9 @@ command!(mimic(_ctx, msg) {
                                 for word in &line {
                                     if word.starts_with("<@") {}
                                     else {
-                                        rep.push_str(&word);
-                                        rep.push_str(" ") }}
-                                rep.push_str("\n\n");
+                                        reply.push_str(&word);
+                                        reply.push_str(" ") }}
+                                reply.push_str("\n\n");
                                 num_resp += 1 }}}}
-                
-                let _ = msg.reply(&format!("Mimicking{}:\n\n{}", mimic_str, rep)); }}}});
+
+                let _ = msg.reply(&format!("Mimicking{}:\n\n{}", mimic_str, reply)); }}}});

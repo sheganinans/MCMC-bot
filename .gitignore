@@ -12,5 +12,3 @@ Cargo.lock
 data/init
 data/raw/*
 !data/raw/.gitkeep
-data/chain/*
-!data/chain/.gitkeep

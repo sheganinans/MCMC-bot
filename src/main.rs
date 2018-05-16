@@ -10,7 +10,6 @@ use serenity::client::Client;
 use serenity::framework::StandardFramework;
 use serenity::framework::standard::DispatchError;
 use serenity::http;
-use serenity::model::guild::Guild;
 use serenity::model::id::UserId;
 use serenity::model::user::User;
 use serenity::prelude::*;
@@ -21,15 +20,9 @@ use std::io::prelude::*;
 use std::fs::{File, OpenOptions};
 use std::path::Path;
 
-
-struct Handler;
-impl EventHandler for Handler {
-    fn guild_create(&self, _ctx : Context, _guild : Guild, _newly_joined : bool) {}}
-
-
 fn main() {
-    let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"), Handler)
-        .expect("client err.");
+    let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("Missing DISCORD_TOKEN"), Handler)
+        .expect("client err");
 
     let owners = match http::get_current_application_info() {
         Ok(info) => { let mut set = HashSet::new();
@@ -101,7 +94,6 @@ command!(mimic(_ctx, msg) {
                 let chain_id = fold_ids(&sorted_user_ids(ms.to_vec()));
                 if !does_chain_exist(&chain_id) {
                     let _ = msg.reply("Beep Boop! This mimic doesn't exist yet! Generating..");
-
                     let mut chain = Chain::of_order(2);
                     for m in ms { chain.feed_file(&Path::new(&format!("./data/raw/{}", m.id.0)))?; }
                     chain.save(&Path::new(&format!("./data/chain/{}", chain_id)))?;
@@ -129,7 +121,10 @@ command!(mimic(_ctx, msg) {
 			match line {
 				None => {},
 				Some(line) => {
-					if line[0].starts_with(";;") || line[0].starts_with(".") || line[0].starts_with("!") || line.len() < 7 {}
+					if line[0].starts_with(";;") ||
+						 line[0].starts_with(".") ||
+						 line[0].starts_with("!") ||
+						 line.len() < 7 {}
 					else {
 	                        		for word in line {
 							if word.starts_with("<") {}

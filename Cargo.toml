@@ -5,6 +5,6 @@ authors = ["ace"]
 
 [dependencies]
 serenity = { version = "0.5.1", default-features = true }
-markov = "1.0.1"
+markov = "1.0.2"
 itertools = "0.7.8"
 quickersort = "3.0.1"

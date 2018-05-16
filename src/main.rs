@@ -1,12 +1,7 @@
-#![feature(slice_patterns)]
-
-#[macro_use] extern crate itertools;
              extern crate markov;
 #[macro_use] extern crate serenity;
              extern crate quickersort;
 
-
-use itertools::Itertools;
 
 use markov::Chain;
 
@@ -15,7 +10,6 @@ use serenity::client::Client;
 use serenity::framework::StandardFramework;
 use serenity::framework::standard::DispatchError;
 use serenity::http;
-use serenity::model::channel::Message;
 use serenity::model::guild::Guild;
 use serenity::model::id::UserId;
 use serenity::model::user::User;
@@ -23,10 +17,8 @@ use serenity::prelude::*;
 
 use std::collections::HashSet;
 use std::env;
-use std::io;
 use std::io::prelude::*;
-use std::fs::{self, File, OpenOptions};
-use std::ffi;
+use std::fs::{File, OpenOptions};
 use std::path::Path;
 
 
@@ -104,24 +96,52 @@ command!(mimic(_ctx, msg) {
     if !Path::new("./data/init").exists() { let _ = msg.reply("Still working on it! Gibs me time.."); }
     else {
         match &msg.mentions.clone().into_iter().filter(|x| !x.bot).collect::<Vec<_>>()[..] {
-            &[] => { let _ = msg.reply("Requires @mention."); },
+            &[] => { let _ = msg.reply("Requires non-bot @mention."); },
             ms  => {
                 let chain_id = fold_ids(&sorted_user_ids(ms.to_vec()));
                 if !does_chain_exist(&chain_id) {
                     let _ = msg.reply("Beep Boop! This mimic doesn't exist yet! Generating..");
 
-                    let mut chain = Chain::of_order(1);
+                    let mut chain = Chain::of_order(2);
                     for m in ms { chain.feed_file(&Path::new(&format!("./data/raw/{}", m.id.0)))?; }
                     chain.save(&Path::new(&format!("./data/chain/{}", chain_id)))?;
 
-                    let _ = msg.reply("Mimic ready! Let's see what it's like!");
+                    let _ = msg.reply(&format!("Mimic {} ready! Let's see what it's like!", chain_id));
                 } else {()}
 
-                let mut chain = Chain::<String>::load(&Path::new(&format!("./data/chain/{}", chain_id)))?;
+		let _ = msg.reply(&format!("Loading mimic: {}", chain_id));
+                let mut chain = Chain::<String>::load(&Path::new(&format!("./data/chain/{}", chain_id)));
 
+		match chain {
+		Err(err) => { let _ = msg.reply(&format!("ERR! {:?}", err)); },
+		Ok(chain) => {
+//		let _ = msg.reply("Chain loaded.");
                 let mimic_str = ms.iter().fold("".to_string(),
                                                |mut acc, val| { acc.push_str(" ");
                                                                 acc.push_str(&val.name);
                                                                 acc });
-
-                let _ = msg.reply(&format!("Mimicking{}:\n{}", mimic_str, chain.generate_str())); }}}});
+//		let _ = msg.reply("Mimicing");
+		let mut rep = "".to_string();
+		let mut ch = chain.iter();
+		let mut num_resp = 0;
+		while num_resp < 10 {
+			let line = ch.next();
+			match line {
+				None => {},
+				Some(line) => {
+					if line[0].starts_with(";;") || line[0].starts_with(".") || line[0].starts_with("!") || line.len() < 7 {}
+					else {
+	                        		for word in line {
+							if word.starts_with("<") {}
+							else {
+								rep.push_str(&word);
+								rep.push_str(" ")
+							}
+                        			}
+                        			rep.push_str("\n\n");
+						num_resp += 1
+					}
+				}
+			}
+		}
+                let _ = msg.reply(&format!("Mimicking{}:\n\n{}", mimic_str, rep)); }}}}}});

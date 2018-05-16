@@ -8,7 +8,7 @@ in
     buildInputs = [
       libopus
       libsodium
-      nixpkgs.latest.rustChannels.nightly.rust
+      nixpkgs.latest.rustChannels.stable.rust
       openssl
       pkgconfig
       ];

@@ -91,7 +91,7 @@ command!(mimic(_ctx, msg) {
                 while num_resp < 10 {
                     let line = chain_iter.next();
                     match line {
-                        None => {},
+                        None => { break },
                         Some(line) => {
                             let first_word = &line[0];
                             if first_word.starts_with(";;") ||

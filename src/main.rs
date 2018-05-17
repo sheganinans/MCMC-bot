@@ -62,17 +62,16 @@ command!(init(_ctx, msg) {
                 &[] => break,
                 msgs => {
                     for m in msgs.iter().filter(|m| !m.author.bot) {
-                        if !does_raw_exist(&m.author.id.0) {
-                            let mut file = File::create(&format!("./data/raw/{}", m.author.id.0))?;
-                            file.write_all(format!("{}\n", m.content).as_bytes())?;
-                            file.sync_all()?; }
-                        else {
-                            let mut file = OpenOptions::new()
-                                .append(true)
-                                .open(&format!("./data/raw/{}", m.author.id.0))
-                                .unwrap();
-                            file.write_all(format!("{}\n", m.content).as_bytes())?;
-                            file.sync_all()?; }}
+                        let mut file =
+                            if !does_raw_exist(&m.author.id.0) {
+                                File::create(&format!("./data/raw/{}", m.author.id.0))? }
+                            else {
+                                OpenOptions::new()
+                                    .append(true)
+                                    .open(&format!("./data/raw/{}", m.author.id.0))
+                                    .unwrap() };
+                        file.write_all(format!("{}\n", m.content).as_bytes())?;
+                        file.sync_all()?; }
                     m_id = msgs.last().unwrap().id }}}
         OpenOptions::new().create(true).write(true).open("./data/init").unwrap();
         let _ = msg.reply("Init done."); }});

@@ -62,14 +62,10 @@ command!(init(_ctx, msg) {
                 &[] => break,
                 msgs => {
                     for m in msgs.iter().filter(|m| !m.author.bot) {
+                        let file_name = format!("./data/raw/{}", m.author.id.0);
                         let mut file =
-                            if !does_raw_exist(&m.author.id.0) {
-                                File::create(&format!("./data/raw/{}", m.author.id.0))? }
-                            else {
-                                OpenOptions::new()
-                                    .append(true)
-                                    .open(&format!("./data/raw/{}", m.author.id.0))
-                                    .unwrap() };
+                            if !does_raw_exist(&m.author.id.0) { File::create(&file_name)? }
+                            else { OpenOptions::new().append(true).open(&file_name)? };
                         file.write_all(format!("{}\n", m.content).as_bytes())?;
                         file.sync_all()?; }
                     m_id = msgs.last().unwrap().id }}}

@@ -1,0 +1,64 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug MCMC Bot",
+        "type": "lldb",
+        "request": "launch",
+        "program": "${workspaceFolder}/target/debug/mcmc-bot",
+        "args": [],
+        "cwd": "${workspaceFolder}",
+        "sourceLanguages": ["rust"],
+        "sourceMap": {
+          "/home/jinn/src/MCMC-bot": "${workspaceFolder}"
+        },
+        "preLaunchTask": "build",
+        "postDebugTask": "cleanup",
+        "stopOnEntry": false,
+        "env": {
+          "DISCORD_TOKEN": "${env:DISCORD_TOKEN}"
+        }
+      }
+    ],
+    "tasks": [
+      {
+        "label": "build",
+        "type": "shell",
+        "command": "cargo",
+        "args": ["build"],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": ["$rustc"],
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared",
+          "showReuseMessage": false,
+          "clear": false
+        },
+        "runOptions": {
+          "runOn": "folderOpen"
+        }
+      },
+      {
+        "label": "cleanup",
+        "type": "shell",
+        "command": "cargo",
+        "args": ["clean"],
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared",
+          "showReuseMessage": false,
+          "clear": false
+        },
+        "runOptions": {
+          "runOn": "folderClose"
+        }
+      }
+    ]
+  }

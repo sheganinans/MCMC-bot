@@ -1,10 +1,10 @@
 [package]
-name = "disbot"
+name = "mcmc-bot"
 version = "0.1.0"
 authors = ["ace"]
+edition = "2021"
 
 [dependencies]
-serenity = { version = "0.5.1", default-features = true }
-markov = "1.0.2"
-itertools = "0.7.8"
-quickersort = "3.0.1"
+serenity = { version = "0.12", features = [ "full" ] }
+tokio = { version = "1.21.2", features = [ "macros", "rt-multi-thread" ] }
+markov = "1.1.0"

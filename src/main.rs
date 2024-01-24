@@ -37,9 +37,7 @@ async fn main() {
     .expect("Error creating client");
 
   if let Err(why) = client.start().await {
-    println!("An error occurred while running the client: {:?}", why)
-  }
-}
+    println!("An error occurred while running the client: {:?}", why) } }
 
 fn does_raw_exist(f: &u64) -> bool { Path::new(&format!("./data/raw/{}", f)).exists() }
 
@@ -65,7 +63,11 @@ async fn init(ctx: &Context, msg: &Message) -> CommandResult {
             let mut file =
                 if !does_raw_exist(&m.author.id.get()) { File::create(&file_name).await? }
                 else { OpenOptions::new().append(true).open(&file_name).await? };
-            let content = m.content.split(" ").filter(|x| !(x.starts_with("http://") || x.starts_with("https://"))).collect::<Vec<_>>().join(" ");
+            let content =
+              m.content.split(" ")
+                .filter(|x| !(x.starts_with("http://") || x.starts_with("https://")))
+                .collect::<Vec<_>>()
+                .join(" ");
             file.write_all(format!("{}\n", content).as_bytes()).await?;
             file.sync_all().await?; }
           m_id = msgs.last().unwrap().id } } }

@@ -28,7 +28,7 @@ struct Handler;
 impl EventHandler for Handler {
   async fn message(&self, ctx: Context, msg: Message) {
     if msg.mentions_user_id(1195538057823268914) {
-      let _ = msg.reply(ctx, mimic_impl(vec![321132914576457728]).await).await;
+      let _ = msg.reply(ctx, mimic_impl(vec![321132914576457728])).await;
     }
   }
 }
@@ -84,7 +84,7 @@ async fn init(ctx: &Context, msg: &Message) -> CommandResult {
     msg.reply(ctx, "Done.").await?; }
   Ok(()) }
 
-async fn mimic_impl(ms: Vec<u64>) -> String {
+fn mimic_impl(ms: Vec<u64>) -> String {
   let mut chain : Chain<String> = Chain::of_order(1);
   let mut set = HashSet::<String>::new();
   for m in ms {
@@ -111,6 +111,6 @@ async fn mimic(ctx: &Context, msg: &Message) -> CommandResult {
     match &msg.mentions.clone().into_iter().filter(|x| !x.bot).collect::<Vec<_>>()[..] {
       &[] => { msg.reply(ctx, "Requires non-bot @mention.").await?; },
       ms  => {
-        let rsp = mimic_impl(ms.iter().map(|u| u.id.get()).collect::<Vec<_>>()).await;
+        let rsp = mimic_impl(ms.iter().map(|u| u.id.get()).collect::<Vec<_>>());
         msg.reply(ctx, rsp).await?; } } }
   Ok(()) }

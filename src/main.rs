@@ -28,6 +28,7 @@ struct Handler;
 impl EventHandler for Handler {
   async fn message(&self, ctx: Context, msg: Message) {
     if msg.mentions_user_id(1195538057823268914) {
+      let _ = add_line(msg.author.id.get(), msg.content.clone()).await;
       let _ = msg.reply(ctx, mimic_impl(vec![321132914576457728])).await;
     }
   }
@@ -50,6 +51,21 @@ async fn main() {
 
 fn does_raw_exist(f: &u64) -> bool { Path::new(&format!("./data/raw/{}", f)).exists() }
 
+async fn add_line(u: u64, l: String) -> Result<(), std::io::Error> {
+  let file_name = format!("./data/raw/{}", u);
+  let mut file =
+      if !does_raw_exist(&u) { File::create(&file_name).await? }
+      else { OpenOptions::new().append(true).open(&file_name).await? };
+  let content =
+    l.split(" ")
+      .filter(|x| !(x.starts_with("http://") || x.starts_with("https://")))
+      .collect::<Vec<_>>()
+      .join(" ");
+  file.write_all(format!("{}\n", content).as_bytes()).await?;
+  file.sync_all().await?;
+  Ok(())
+}
+
 #[command]
 async fn init(ctx: &Context, msg: &Message) -> CommandResult {
   if msg.author.id != 377667908098064384 { msg.reply(ctx, "You're not Ace, lol!").await?; }
@@ -61,24 +77,11 @@ async fn init(ctx: &Context, msg: &Message) -> CommandResult {
     loop {
       let retriever = GetMessages::default().before(m_id);
       let messages = channel_id.messages(&ctx.http, retriever).await?;
-      msg.reply(ctx, format!("{} messages.", messages.len())).await?;
       match &messages[..] {
         &[] => break,
         msgs => {
           for m in msgs.iter().filter(|m| !m.author.bot) {
-            msg.reply(ctx, format!("<@&{}>: {}", m.author.name, m.content)).await?;
-            let file_name = format!("./data/raw/{}", m.author.id);
-            println!("Writing to {}", file_name);
-            let mut file =
-                if !does_raw_exist(&m.author.id.get()) { File::create(&file_name).await? }
-                else { OpenOptions::new().append(true).open(&file_name).await? };
-            let content =
-              m.content.split(" ")
-                .filter(|x| !(x.starts_with("http://") || x.starts_with("https://")))
-                .collect::<Vec<_>>()
-                .join(" ");
-            file.write_all(format!("{}\n", content).as_bytes()).await?;
-            file.sync_all().await?; }
+            add_line(m.author.id.get(), m.content.clone()).await?; }
           m_id = msgs.last().unwrap().id } } }
     OpenOptions::new().create(true).write(true).open("./data/init").await?;
     msg.reply(ctx, "Done.").await?; }

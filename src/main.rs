@@ -1,10 +1,13 @@
 extern crate markov;
 extern crate serenity;
 
+use std::collections::HashSet;
+use std::fs::read_to_string;
 use std::env;
 use std::path::Path;
 
 use markov::Chain;
+use rand::Rng;
 use serenity::async_trait;
 use serenity::builder::GetMessages;
 use serenity::model::id::ChannelId;
@@ -22,7 +25,13 @@ struct General;
 struct Handler;
 
 #[async_trait]
-impl EventHandler for Handler {}
+impl EventHandler for Handler {
+  async fn message(&self, ctx: Context, msg: Message) {
+    if msg.mentions_user_id(1195538057823268914) {
+      let _ = msg.reply(ctx, mimic_impl(vec![321132914576457728]).await).await;
+    }
+  }
+}
 
 #[tokio::main]
 async fn main() {
@@ -75,6 +84,26 @@ async fn init(ctx: &Context, msg: &Message) -> CommandResult {
     msg.reply(ctx, "Done.").await?; }
   Ok(()) }
 
+async fn mimic_impl(ms: Vec<u64>) -> String {
+  let mut chain : Chain<String> = Chain::of_order(1);
+  let mut set = HashSet::<String>::new();
+  for m in ms {
+    let path_str = format!("./data/raw/{}", m);
+    { let _ = chain.feed_file(Path::new(&path_str)); }
+    for line in read_to_string(Path::new(&path_str)).unwrap().lines() {
+      set.insert(line.to_string()); } }
+
+  let mut ret = String::new();
+  let mut rng = rand::thread_rng();
+  let min_msg_len = rng.gen_range(10..=25);
+  while ret.split(" ").count() < min_msg_len {
+    let mimic = chain.generate_str();
+    if !set.contains(&mimic) {
+      if ret.len() != 0 { ret.push_str(". "); }
+      ret.push_str(&mimic) } }
+  ret
+}
+
 #[command]
 async fn mimic(ctx: &Context, msg: &Message) -> CommandResult {
   if !Path::new("./data/init").exists() { msg.reply(ctx, "Still working on it! Gibs me time..").await?; }
@@ -82,7 +111,6 @@ async fn mimic(ctx: &Context, msg: &Message) -> CommandResult {
     match &msg.mentions.clone().into_iter().filter(|x| !x.bot).collect::<Vec<_>>()[..] {
       &[] => { msg.reply(ctx, "Requires non-bot @mention.").await?; },
       ms  => {
-        let mut chain : Chain<String> = Chain::of_order(1);
-        for m in ms { chain.feed_file(&Path::new(&format!("./data/raw/{}", m.id)))?; }
-        msg.reply(ctx, chain.generate_str()).await?; } } }
+        let rsp = mimic_impl(ms.iter().map(|u| u.id.get()).collect::<Vec<_>>()).await;
+        msg.reply(ctx, rsp).await?; } } }
   Ok(()) }

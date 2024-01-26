@@ -29,10 +29,7 @@ impl EventHandler for Handler {
   async fn message(&self, ctx: Context, msg: Message) {
     if msg.mentions_user_id(1195538057823268914) {
       let _ = add_line(msg.author.id.get(), msg.content.clone()).await;
-      let _ = msg.reply(ctx, mimic_impl(vec![321132914576457728])).await;
-    }
-  }
-}
+      let _ = msg.reply(ctx, mimic_impl(vec![321132914576457728])).await; } } }
 
 #[tokio::main]
 async fn main() {
@@ -63,8 +60,7 @@ async fn add_line(u: u64, l: String) -> Result<(), std::io::Error> {
       .join(" ");
   file.write_all(format!("{}\n", content).as_bytes()).await?;
   file.sync_all().await?;
-  Ok(())
-}
+  Ok(()) }
 
 #[command]
 async fn init(ctx: &Context, msg: &Message) -> CommandResult {
@@ -72,7 +68,6 @@ async fn init(ctx: &Context, msg: &Message) -> CommandResult {
   else {
     msg.reply(ctx, "Initing.").await?;
     let channel_id = ChannelId::new(1013954641832185908);
-
     let mut m_id = msg.id;
     loop {
       let retriever = GetMessages::default().before(m_id);
@@ -104,8 +99,7 @@ fn mimic_impl(ms: Vec<u64>) -> String {
     if !set.contains(&mimic) {
       if ret.len() != 0 { ret.push_str(". "); }
       ret.push_str(&mimic) } }
-  ret
-}
+  ret }
 
 #[command]
 async fn mimic(ctx: &Context, msg: &Message) -> CommandResult {

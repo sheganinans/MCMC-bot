@@ -24,12 +24,20 @@ struct General;
 
 struct Handler;
 
+static mut COUNTER: u32 = 0;
+
 #[async_trait]
 impl EventHandler for Handler {
   async fn message(&self, ctx: Context, msg: Message) {
-    if msg.mentions_user_id(1195538057823268914) {
-      let _ = add_line(msg.author.id.get(), msg.content.clone()).await;
-      let _ = msg.reply(ctx, mimic_impl(vec![321132914576457728])).await; } } }
+    unsafe {
+      COUNTER += 1;
+      if COUNTER % 20 == 0 {
+        let channel_id = ChannelId::new(1013954641832185908);
+        let _ = channel_id.say(ctx.clone(), mimic_impl(vec![321132914576457728])).await; }
+      else {
+        if !msg.author.bot { let _ = add_line(msg.author.id.get(), msg.content.clone()).await;}
+        if msg.mentions_user_id(1195538057823268914) {
+          let _ = msg.reply(ctx, mimic_impl(vec![321132914576457728])).await; } } } } }
 
 #[tokio::main]
 async fn main() {

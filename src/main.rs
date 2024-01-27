@@ -31,7 +31,7 @@ impl EventHandler for Handler {
   async fn message(&self, ctx: Context, msg: Message) {
     unsafe {
       COUNTER += 1;
-      if COUNTER % 20 == 0 {
+      if COUNTER % 50 == 0 {
         let channel_id = ChannelId::new(1013954641832185908);
         let _ = channel_id.say(ctx.clone(), mimic_impl(vec![321132914576457728])).await; }
       else {

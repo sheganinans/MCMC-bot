@@ -36,11 +36,11 @@ impl EventHandler for Handler {
   async fn message(&self, ctx: Context, msg: Message) {
     unsafe {
       COUNTER += 1;
+      if !msg.author.bot { let _ = add_line(msg.author.id.get(), msg.content.clone()).await;}
       if COUNTER % 50 == 0 {
         let channel_id = ChannelId::new(GENERAL);
         let _ = channel_id.say(ctx.clone(), mimic_impl(vec![RON])).await; }
       else {
-        if !msg.author.bot { let _ = add_line(msg.author.id.get(), msg.content.clone()).await;}
         if msg.mentions_user_id(RON_BOT) { let _ = msg.reply(ctx, mimic_impl(vec![RON])).await; } } } } }
 
 #[tokio::main]
@@ -70,8 +70,9 @@ async fn add_line(u: u64, l: String) -> Result<(), std::io::Error> {
       .filter(|x| !(x.starts_with("http://") || x.starts_with("https://")))
       .collect::<Vec<_>>()
       .join(" ");
-  file.write_all(format!("{}\n", content).as_bytes()).await?;
-  file.sync_all().await?;
+  if !content.split(" ").filter(|x| x != &"").collect::<Vec<_>>().len() > 0 {
+    file.write_all(format!("{}\n", content).as_bytes()).await?;
+    file.sync_all().await?; }
   Ok(()) }
 
 #[command]
@@ -88,8 +89,7 @@ async fn init(ctx: &Context, msg: &Message) -> CommandResult {
         &[] => break,
         msgs => {
           for m in msgs.iter().filter(|m| !m.author.bot) {
-            if !m.content.split(" ").filter(|x| x != &"").collect::<Vec<_>>().len() > 0 {
-              add_line(m.author.id.get(), m.content.clone()).await?; } }
+            add_line(m.author.id.get(), m.content.clone()).await?; }
           m_id = msgs.last().unwrap().id } } }
     OpenOptions::new().create(true).write(true).open("./data/init").await?;
     msg.reply(ctx, "Done.").await?; }

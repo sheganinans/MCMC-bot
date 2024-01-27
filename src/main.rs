@@ -26,18 +26,23 @@ struct Handler;
 
 static mut COUNTER: u32 = 0;
 
+const GENERAL : u64 = 1013954641832185908;
+const RON : u64 = 321132914576457728;
+const RON_BOT : u64 = 1195538057823268914;
+const ACE : u64 = 377667908098064384;
+
 #[async_trait]
 impl EventHandler for Handler {
   async fn message(&self, ctx: Context, msg: Message) {
     unsafe {
       COUNTER += 1;
       if COUNTER % 50 == 0 {
-        let channel_id = ChannelId::new(1013954641832185908);
-        let _ = channel_id.say(ctx.clone(), mimic_impl(vec![321132914576457728])).await; }
+        let channel_id = ChannelId::new(GENERAL);
+        let _ = channel_id.say(ctx.clone(), mimic_impl(vec![RON])).await; }
       else {
         if !msg.author.bot { let _ = add_line(msg.author.id.get(), msg.content.clone()).await;}
-        if msg.mentions_user_id(1195538057823268914) {
-          let _ = msg.reply(ctx, mimic_impl(vec![321132914576457728])).await; } } } } }
+        if msg.mentions_user_id(RON_BOT) {
+          let _ = msg.reply(ctx, mimic_impl(vec![RON])).await; } } } } }
 
 #[tokio::main]
 async fn main() {
@@ -72,10 +77,10 @@ async fn add_line(u: u64, l: String) -> Result<(), std::io::Error> {
 
 #[command]
 async fn init(ctx: &Context, msg: &Message) -> CommandResult {
-  if msg.author.id != 377667908098064384 { msg.reply(ctx, "You're not Ace, lol!").await?; }
+  if msg.author.id != ACE { msg.reply(ctx, "You're not Ace, lol!").await?; }
   else {
     msg.reply(ctx, "Initing.").await?;
-    let channel_id = ChannelId::new(1013954641832185908);
+    let channel_id = ChannelId::new(GENERAL);
     let mut m_id = msg.id;
     loop {
       let retriever = GetMessages::default().before(m_id);

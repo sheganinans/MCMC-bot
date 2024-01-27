@@ -88,7 +88,8 @@ async fn init(ctx: &Context, msg: &Message) -> CommandResult {
         &[] => break,
         msgs => {
           for m in msgs.iter().filter(|m| !m.author.bot) {
-            add_line(m.author.id.get(), m.content.clone()).await?; }
+            if !m.content.split(" ").filter(|x| x != &"").collect::<Vec<_>>().len() > 0 {
+              add_line(m.author.id.get(), m.content.clone()).await?; } }
           m_id = msgs.last().unwrap().id } } }
     OpenOptions::new().create(true).write(true).open("./data/init").await?;
     msg.reply(ctx, "Done.").await?; }

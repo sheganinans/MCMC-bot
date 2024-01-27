@@ -41,8 +41,7 @@ impl EventHandler for Handler {
         let _ = channel_id.say(ctx.clone(), mimic_impl(vec![RON])).await; }
       else {
         if !msg.author.bot { let _ = add_line(msg.author.id.get(), msg.content.clone()).await;}
-        if msg.mentions_user_id(RON_BOT) {
-          let _ = msg.reply(ctx, mimic_impl(vec![RON])).await; } } } } }
+        if msg.mentions_user_id(RON_BOT) { let _ = msg.reply(ctx, mimic_impl(vec![RON])).await; } } } } }
 
 #[tokio::main]
 async fn main() {

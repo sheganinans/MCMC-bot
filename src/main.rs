@@ -27,9 +27,9 @@ struct Handler;
 static mut COUNTER: u32 = 0;
 
 const GENERAL : u64 = 1013954641832185908;
-const RON : u64 = 321132914576457728;
+const RON     : u64 = 321132914576457728;
 const RON_BOT : u64 = 1195538057823268914;
-const ACE : u64 = 377667908098064384;
+const ACE     : u64 = 377667908098064384;
 
 #[async_trait]
 impl EventHandler for Handler {
